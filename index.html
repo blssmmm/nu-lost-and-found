@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pawst &amp; Found</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:Arial,sans-serif;background:#f5f0eb;}
+
+/* PAW PRINT SVG used as background pattern */
+body::before{
+  content:'';
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23c9a84c' opacity='0.08'%3E%3Cellipse cx='30' cy='20' rx='7' ry='9'/%3E%3Cellipse cx='50' cy='20' rx='7' ry='9'/%3E%3Cellipse cx='18' cy='35' rx='6' ry='8'/%3E%3Cellipse cx='62' cy='35' rx='6' ry='8'/%3E%3Cellipse cx='40' cy='52' rx='13' ry='16'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:80px 80px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* PAGES */
+.pg{display:none;position:relative;z-index:1;}
+.pg.active{display:block;}
+
+/* ── COLORS ── */
+:root{
+  --blue:#003087;--blue2:#001f5b;--blue3:#004db3;
+  --gold:#C9A84C;--gold2:#8a6a1e;--gold3:#f5e6c0;
+  --brown:#5c3d1e;--cream:#fdf8f2;
+  --green:#2d6a0a;--green-bg:#EAF3DE;
+  --red:#902020;--red-bg:#FCEBEB;
+  --amber:#7a4500;--amber-bg:#FAEEDA;
+  --border:#e0d5c5;--muted:#7a6a5a;
+  --radius:12px;--radius-sm:8px;
+}
+
+/* ── BUTTONS ── */
+button{font-family:Arial,sans-serif;cursor:pointer;border:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+button:active{opacity:0.8;}
+
+.btn{display:block;width:100%;padding:15px;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:bold;font-family:Arial,sans-serif;color:white;background:var(--blue);margin-bottom:10px;text-align:center;cursor:pointer;-webkit-appearance:none;}
+.btn-gold{background:var(--gold2);}
+.btn:active{opacity:0.8;}
+.sbtn{display:inline-block;padding:13px 20px;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:bold;font-family:Arial,sans-serif;color:white;background:var(--blue);cursor:pointer;-webkit-appearance:none;}
+.sbtn.full{display:block;width:100%;}
+.sbtn.outline{background:white;color:var(--blue);border:2px solid var(--blue);margin-top:10px;}
+.sbtn.green-btn{background:var(--green);}
+.sbtn.red-btn{background:var(--red);}
+.sbtn:active{opacity:0.8;}
+.nav-btn{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:6px;padding:8px 14px;font-size:13px;font-weight:bold;font-family:Arial,sans-serif;cursor:pointer;}
+.nav-btn:active{background:rgba(255,255,255,0.3);}
+.tdbtn{padding:6px 12px;border:none;border-radius:20px;font-size:12px;font-weight:bold;cursor:pointer;margin-right:4px;margin-bottom:4px;font-family:Arial,sans-serif;}
+.tdbtn.blue{background:#dce8f8;color:var(--blue);}
+.tdbtn.green{background:var(--green-bg);color:var(--green);}
+.tdbtn.red{background:var(--red-bg);color:var(--red);}
+
+/* ── FORMS ── */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:bold;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.field input,.field select,.field textarea{display:block;width:100%;padding:12px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:Arial,sans-serif;background:white;color:#333;-webkit-appearance:none;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);}
+.field textarea{resize:vertical;min-height:80px;}
+.lbl{display:block;font-size:12px;font-weight:bold;color:var(--muted);margin-bottom:5px;text-transform:uppercase;}
+.inp{display:block;width:100%;padding:13px 14px;margin-bottom:14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:Arial,sans-serif;-webkit-appearance:none;background:white;}
+.inp:focus{outline:none;border-color:var(--blue);}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;}
+.badge.green{background:var(--green-bg);color:var(--green);}
+.badge.amber{background:var(--amber-bg);color:var(--amber);}
+.badge.gray{background:#eee;color:#555;}
+
+/* ── BULLDOG SVG ── */
+.bulldog-svg{display:block;margin:0 auto 8px;width:80px;height:80px;}
+
+/* ── LOGIN ── */
+.login-wrap{
+  min-height:100vh;
+  background:linear-gradient(160deg,#001f5b,#003087,#004db3);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 16px;
+  position:relative;overflow:hidden;
+}
+.login-wrap::before{
+  content:'🐾';font-size:120px;opacity:0.05;
+  position:absolute;top:-20px;right:-20px;transform:rotate(20deg);
+}
+.login-wrap::after{
+  content:'🐾';font-size:100px;opacity:0.05;
+  position:absolute;bottom:-10px;left:-20px;transform:rotate(-15deg);
+}
+.login-box{background:var(--cream);border-radius:16px;overflow:hidden;width:100%;max-width:400px;box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+.login-top{background:var(--blue);padding:28px 24px;text-align:center;position:relative;}
+.paw-deco{font-size:18px;position:absolute;top:10px;right:14px;opacity:0.4;}
+.paw-deco2{font-size:18px;position:absolute;top:10px;left:14px;opacity:0.4;}
+.login-top h1{color:white;font-size:22px;font-weight:bold;margin-bottom:4px;letter-spacing:.5px;}
+.login-top p{color:rgba(255,255,255,0.65);font-size:13px;}
+.paw-title{font-size:28px;margin-bottom:4px;}
+.login-form{padding:24px;}
+.login-note{font-size:12px;color:#888;text-align:center;margin-top:12px;line-height:1.6;}
+.login-note b{color:var(--blue);}
+.login-or{text-align:center;color:#bbb;font-size:12px;margin:4px 0 10px;}
+
+/* ── TOPNAV ── */
+.topnav{
+  background:var(--blue);padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:99;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+.topnav-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1;}
+.topnav-logo{
+  width:38px;height:38px;background:var(--gold);border-radius:50%;
+  text-align:center;line-height:38px;font-size:20px;flex-shrink:0;
+}
+.topnav-title{color:white;font-size:14px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topnav-sub{color:rgba(255,255,255,0.6);font-size:11px;}
+.topnav-right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:10px;}
+.role-badge{background:var(--gold);color:var(--blue);font-size:11px;font-weight:bold;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+
+/* ── TABS ── */
+.tabbar{background:white;border-bottom:2px solid var(--border);display:flex;overflow-x:auto;white-space:nowrap;scrollbar-width:none;}
+.tabbar::-webkit-scrollbar{display:none;}
+.tabitem{display:inline-block;padding:13px 16px;font-size:14px;font-weight:bold;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.tabitem.on{color:var(--blue);border-bottom-color:var(--blue);}
+
+/* ── CONTENT ── */
+.content{padding:18px 16px;max-width:1100px;margin:0 auto;}
+.pane{display:none;}
+.pane.on{display:block;}
+
+/* ── SECTION TITLE ── */
+.stitle{font-size:17px;font-weight:bold;margin-bottom:10px;color:var(--brown);}
+.shint{font-size:13px;color:var(--muted);margin-bottom:14px;}
+
+/* ── FILTERS ── */
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.fc{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:bold;border:1.5px solid var(--border);background:white;color:var(--muted);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.fc.on{background:var(--blue);color:white;border-color:var(--blue);}
+
+/* ── ITEM GRID ── */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+@media(min-width:500px){.grid{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:750px){.grid{grid-template-columns:repeat(4,1fr);}}
+
+.icard{
+  background:white;border:1.5px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+  transition:box-shadow 0.15s;
+}
+.icard:active{opacity:0.75;}
+.icard.claimed{opacity:0.5;cursor:default;}
+.ithumb{height:90px;display:flex;align-items:center;justify-content:center;font-size:36px;position:relative;}
+.ithumb::after{content:'🐾';position:absolute;bottom:4px;right:6px;font-size:12px;opacity:0.3;}
+.ibody{padding:10px 12px;}
+.iname{font-size:13px;font-weight:bold;margin-bottom:3px;color:var(--brown);}
+.imeta{font-size:11px;color:var(--muted);}
+.ibadge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:bold;margin-top:6px;}
+.ibadge.green{background:var(--green-bg);color:var(--green);}
+.ibadge.gray{background:#eee;color:#555;}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+@media(min-width:600px){.stats{grid-template-columns:repeat(4,1fr);}}
+.sbox{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;}
+.sbox::before{content:'🐾';position:absolute;bottom:-4px;right:4px;font-size:28px;opacity:0.08;}
+.snum{font-size:28px;font-weight:bold;color:var(--blue);}
+.slbl{font-size:12px;color:var(--muted);margin-top:3px;}
+
+/* ── TABLE ── */
+.twrap{background:white;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:480px;}
+th{background:#f9f5f0;padding:11px 12px;text-align:left;font-size:12px;font-weight:bold;color:var(--muted);border-bottom:1.5px solid var(--border);}
+td{padding:11px 12px;border-bottom:1px solid #f2ece4;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+
+/* ── CLAIM LIST ── */
+.clist{background:white;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.crow{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #f2ece4;gap:10px;}
+.crow:last-child{border-bottom:none;}
+.cname{font-weight:bold;font-size:14px;color:var(--brown);}
+.cdate{font-size:12px;color:var(--muted);margin-top:2px;}
+.cbadge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:bold;white-space:nowrap;}
+.cbadge.amber{background:var(--amber-bg);color:var(--amber);}
+.cbadge.green{background:var(--green-bg);color:var(--green);}
+
+/* ── BANNER ── */
+.banner{background:#e8edf8;border:1px solid #bcd0f0;border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;color:var(--blue);line-height:1.5;margin-top:16px;}
+
+/* ── FORM SECTION ── */
+.fsec{font-size:11px;font-weight:bold;color:#bbb;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px;}
+
+/* ── SUCCESS ── */
+.success-box{text-align:center;padding:32px 20px;}
+.sico{width:72px;height:72px;background:var(--green-bg);border-radius:50%;margin:0 auto 16px;line-height:72px;font-size:32px;color:var(--green);}
+.success-box h3{font-size:20px;font-weight:bold;margin-bottom:10px;color:var(--brown);}
+.success-box p{font-size:14px;color:var(--muted);line-height:1.6;max-width:300px;margin:0 auto 22px;}
+
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 14px 40px;}
+.overlay.open{display:block;}
+.mbox{background:var(--cream);border-radius:16px;width:100%;max-width:500px;margin:0 auto;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.3);}
+.mhead{background:var(--blue);padding:16px 18px;display:flex;align-items:center;justify-content:space-between;}
+.mtitle{color:white;font-size:16px;font-weight:bold;}
+.mclose{background:none;border:none;color:rgba(255,255,255,0.85);font-size:28px;line-height:1;cursor:pointer;padding:0 2px;font-family:Arial,sans-serif;-webkit-appearance:none;}
+.mbody{padding:18px;}
+.mfoot{padding:0 18px 18px;display:flex;gap:10px;flex-wrap:wrap;}
+.mfoot .sbtn{flex:1;min-width:120px;text-align:center;}
+@media(max-width:400px){.mfoot{flex-direction:column;}.mfoot .sbtn{width:100%;min-width:unset;}}
+
+.preview-box{background:#f0ebe2;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:14px;display:flex;gap:12px;align-items:center;margin-bottom:16px;}
+.pico{font-size:34px;flex-shrink:0;}
+.pname{font-size:15px;font-weight:bold;color:var(--brown);}
+.ploc{font-size:12px;color:var(--muted);margin-top:3px;}
+
+.dtbl{width:100%;border-collapse:collapse;font-size:13px;}
+.dtbl td{padding:7px 0;vertical-align:top;}
+.dtbl td:first-child{color:var(--muted);font-weight:bold;width:130px;padding-right:12px;}
+
+/* ── PAW DIVIDER ── */
+.paw-divider{text-align:center;color:var(--gold);font-size:16px;letter-spacing:6px;margin:16px 0;opacity:0.5;}
+
+/* ── HERO BANNER on login ── */
+.mascot-area{text-align:center;padding:10px 0 6px;}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="pg-login" class="pg active">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-top">
+        <span class="paw-deco">🐾</span>
+        <span class="paw-deco2">🐾</span>
+        <div class="mascot-area">
+          <!-- Bulldog SVG Mascot -->
+          <svg class="bulldog-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Body -->
+            <ellipse cx="50" cy="70" rx="26" ry="20" fill="#C9A84C"/>
+            <!-- Head -->
+            <ellipse cx="50" cy="44" rx="24" ry="22" fill="#C9A84C"/>
+            <!-- Forehead wrinkle -->
+            <path d="M36 36 Q50 30 64 36" stroke="#a07830" stroke-width="1.5" fill="none"/>
+            <path d="M38 40 Q50 34 62 40" stroke="#a07830" stroke-width="1.5" fill="none"/>
+            <!-- Ears -->
+            <ellipse cx="27" cy="38" rx="10" ry="13" fill="#b8902a" transform="rotate(-15,27,38)"/>
+            <ellipse cx="73" cy="38" rx="10" ry="13" fill="#b8902a" transform="rotate(15,73,38)"/>
+            <!-- Inner ears -->
+            <ellipse cx="27" cy="38" rx="6" ry="9" fill="#e8c060" transform="rotate(-15,27,38)"/>
+            <ellipse cx="73" cy="38" rx="6" ry="9" fill="#e8c060" transform="rotate(15,73,38)"/>
+            <!-- Eyes -->
+            <circle cx="41" cy="40" r="5" fill="white"/>
+            <circle cx="59" cy="40" r="5" fill="white"/>
+            <circle cx="42" cy="41" r="3" fill="#333"/>
+            <circle cx="60" cy="41" r="3" fill="#333"/>
+            <circle cx="43" cy="40" r="1" fill="white"/>
+            <circle cx="61" cy="40" r="1" fill="white"/>
+            <!-- Nose -->
+            <ellipse cx="50" cy="51" rx="8" ry="5" fill="#5c3d1e"/>
+            <ellipse cx="46" cy="50" rx="3" ry="2.5" fill="#4a2e10"/>
+            <ellipse cx="54" cy="50" rx="3" ry="2.5" fill="#4a2e10"/>
+            <ellipse cx="50" cy="49" rx="2" ry="1" fill="#7a5030" opacity="0.5"/>
+            <!-- Mouth / jowls -->
+            <ellipse cx="42" cy="57" rx="9" ry="6" fill="#b8902a"/>
+            <ellipse cx="58" cy="57" rx="9" ry="6" fill="#b8902a"/>
+            <path d="M41 55 Q50 60 59 55" stroke="#5c3d1e" stroke-width="1.5" fill="none"/>
+            <!-- Underbite teeth -->
+            <rect x="44" y="58" width="5" height="4" rx="1" fill="white"/>
+            <rect x="51" y="58" width="5" height="4" rx="1" fill="white"/>
+            <!-- Collar -->
+            <rect x="30" y="62" width="40" height="7" rx="3" fill="#003087"/>
+            <rect x="47" y="63" width="6" height="5" rx="1" fill="#C9A84C"/>
+            <!-- Paws -->
+            <ellipse cx="32" cy="88" rx="10" ry="7" fill="#C9A84C"/>
+            <ellipse cx="68" cy="88" rx="10" ry="7" fill="#C9A84C"/>
+            <!-- Paw toes -->
+            <circle cx="26" cy="84" r="3" fill="#b8902a"/>
+            <circle cx="32" cy="82" r="3" fill="#b8902a"/>
+            <circle cx="38" cy="84" r="3" fill="#b8902a"/>
+            <circle cx="62" cy="84" r="3" fill="#b8902a"/>
+            <circle cx="68" cy="82" r="3" fill="#b8902a"/>
+            <circle cx="74" cy="84" r="3" fill="#b8902a"/>
+            <!-- Tail -->
+            <path d="M76 68 Q88 60 84 52" stroke="#C9A84C" stroke-width="6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h1>🐾 Pawst &amp; Found</h1>
+        <p>NU Fairview — Sign in with your institutional account</p>
+      </div>
+      <div class="login-form">
+        <label class="lbl">Email Address</label>
+        <input class="inp" type="email" value="juandelacruz@shs.nu-fairview.edu.ph" placeholder="yourname@shs.nu-fairview.edu.ph">
+        <label class="lbl">Password</label>
+        <input class="inp" type="password" value="password" placeholder="••••••••">
+        <button class="btn" onclick="goStudent()">🎓 Sign in as Student</button>
+        <div class="login-or">— or —</div>
+        <button class="btn btn-gold" onclick="goCfc()">🏫 Sign in as CFC Staff</button>
+        <p class="login-note">Use your <b>@shs.nu-fairview.edu.ph</b> account.<br>Unauthorized access is prohibited.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STUDENT ══════════ -->
+<div id="pg-student" class="pg">
+  <div class="topnav">
+    <div class="topnav-left">
+      <div class="topnav-logo">🐾</div>
+      <div>
+        <div class="topnav-title">🐾 Pawst &amp; Found</div>
+        <div class="topnav-sub">Student Portal</div>
+      </div>
+    </div>
+    <div class="topnav-right">
+      <span class="role-badge">Student</span>
+      <button class="nav-btn" onclick="goLogin()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tabitem on" onclick="sTab('browse',this)">🔍 Browse Items</div>
+    <div class="tabitem"    onclick="sTab('claims',this)">📋 My Claims</div>
+    <div class="tabitem"    onclick="sTab('report',this)">📝 Report Lost</div>
+  </div>
+
+  <div class="content">
+
+    <!-- BROWSE -->
+    <div id="s-browse" class="pane on">
+      <div class="stitle">🐶 Items in CFC Custody</div>
+      <div class="shint">Tap an item to file a claim</div>
+      <div class="filters">
+        <div class="fc on"  onclick="filt(this,'all')">All 🐾</div>
+        <div class="fc" onclick="filt(this,'Electronics')">Electronics</div>
+        <div class="fc" onclick="filt(this,'Clothing')">Clothing</div>
+        <div class="fc" onclick="filt(this,'Accessories')">Accessories</div>
+        <div class="fc" onclick="filt(this,'School Supplies')">School Supplies</div>
+        <div class="fc" onclick="filt(this,'Others')">Others</div>
+      </div>
+      <div class="grid" id="igrid"></div>
+    </div>
+
+    <!-- MY CLAIMS -->
+    <div id="s-claims" class="pane">
+      <div class="stitle">📋 My Claim Submissions</div>
+      <div class="clist">
+        <div class="crow">
+          <div><div class="cname">Black Umbrella</div><div class="cdate">Filed: Apr 22, 2026</div></div>
+          <span class="cbadge amber">Under Review</span>
+        </div>
+        <div class="crow">
+          <div><div class="cname">TI-84 Calculator</div><div class="cdate">Filed: Apr 18, 2026</div></div>
+          <span class="cbadge green">Approved ✓</span>
+        </div>
+      </div>
+      <div class="banner">🐾 Approved items must be picked up at the <strong>CFC Office (Building A, Ground Floor)</strong> within 7 days. Bring your valid NU ID.</div>
+    </div>
+
+    <!-- REPORT LOST -->
+    <div id="s-report" class="pane">
+      <div id="s-report-form">
+        <div class="stitle">📝 Report a Lost Item</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px">Submit a report so CFC can match it with items in their possession.</p>
+        <div class="field"><label>Item Name</label><input type="text" placeholder="e.g. Black Casio Watch"></div>
+        <div class="field"><label>Category</label><select><option>Electronics</option><option>Clothing</option><option>Accessories</option><option>School Supplies</option><option>Others</option></select></div>
+        <div class="field"><label>Date Lost</label><input type="date"></div>
+        <div class="field"><label>Location Lost</label><input type="text" placeholder="e.g. Room 402, Building B"></div>
+        <div class="field"><label>Detailed Description</label><textarea rows="4" placeholder="Color, brand, markings, contents..."></textarea></div>
+        <div class="field"><label>Contact Number</label><input type="text" placeholder="09XX-XXX-XXXX"></div>
+        <button class="sbtn full" onclick="submitReport()">🐾 Submit Report</button>
+      </div>
+      <div id="s-report-ok" class="success-box" style="display:none">
+        <div class="sico">✓</div>
+        <h3>Report Submitted!</h3>
+        <p>Your report has been sent to CFC. You will be notified if a matching item is found. 🐾</p>
+        <button class="sbtn outline" onclick="anotherReport()">Submit Another Report</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ CFC ══════════ -->
+<div id="pg-cfc" class="pg">
+  <div class="topnav">
+    <div class="topnav-left">
+      <div class="topnav-logo">🐾</div>
+      <div>
+        <div class="topnav-title">🐾 Pawst &amp; Found</div>
+        <div class="topnav-sub">CFC Admin Panel</div>
+      </div>
+    </div>
+    <div class="topnav-right">
+      <span class="role-badge">Admin</span>
+      <button class="nav-btn" onclick="goLogin()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tabitem on" onclick="cTab('items',this)">📦 Manage Items</div>
+    <div class="tabitem"    onclick="cTab('reqs',this)">📬 Claim Requests</div>
+    <div class="tabitem"    onclick="cTab('post',this)">➕ Post Found Item</div>
+  </div>
+
+  <div class="content">
+
+    <!-- MANAGE ITEMS -->
+    <div id="c-items" class="pane on">
+      <div class="stats">
+        <div class="sbox"><div class="snum">12</div><div class="slbl">Active items</div></div>
+        <div class="sbox"><div class="snum">4</div><div class="slbl">Pending claims</div></div>
+        <div class="sbox"><div class="snum">31</div><div class="slbl">Returned this month</div></div>
+        <div class="sbox"><div class="snum">7</div><div class="slbl">Avg. days to return</div></div>
+      </div>
+      <div class="stitle" style="margin-bottom:12px">🐶 Items in Custody</div>
+      <div class="twrap">
+        <table><thead><tr><th>Item</th><th>Category</th><th>Found At</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="cfc-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- CLAIM REQUESTS -->
+    <div id="c-reqs" class="pane">
+      <div class="stitle" style="margin-bottom:12px">📬 Incoming Claim Requests</div>
+      <div class="twrap">
+        <table><thead><tr><th>Item</th><th>Claimant</th><th>Student No.</th><th>Submitted</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Black Umbrella</strong></td><td>Juan Dela Cruz</td><td>2021-00123</td><td>Apr 22</td>
+            <td><button class="tdbtn blue" onclick="openOverlay('ov-view')">View</button><button class="tdbtn green">Approve</button><button class="tdbtn red">Reject</button></td>
+          </tr>
+          <tr>
+            <td><strong>Gray Hoodie (M)</strong></td><td>Maria Santos</td><td>2022-00456</td><td>Apr 23</td>
+            <td><button class="tdbtn blue" onclick="openOverlay('ov-view')">View</button><button class="tdbtn green">Approve</button><button class="tdbtn red">Reject</button></td>
+          </tr>
+          <tr>
+            <td><strong>Wireless Earbuds</strong></td><td>Carlos Reyes</td><td>2023-00789</td><td>Apr 24</td>
+            <td><button class="tdbtn blue" onclick="openOverlay('ov-view')">View</button><button class="tdbtn green">Approve</button><button class="tdbtn red">Reject</button></td>
+          </tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- POST ITEM -->
+    <div id="c-post" class="pane">
+      <div id="c-post-form">
+        <div class="stitle">➕ Post a Found Item</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:20px">Add an item so students can browse and file a claim.</p>
+        <div class="field"><label>Item Name</label><input type="text" placeholder="e.g. Samsung Galaxy Earbuds"></div>
+        <div class="field"><label>Category</label><select><option>Electronics</option><option>Clothing</option><option>Accessories</option><option>School Supplies</option><option>Others</option></select></div>
+        <div class="field"><label>Where was it found?</label><input type="text" placeholder="e.g. Library, 2nd floor"></div>
+        <div class="field"><label>Date Found</label><input type="date"></div>
+        <div class="field"><label>Description</label><textarea rows="3" placeholder="Color, brand, condition, markings..."></textarea></div>
+        <button class="sbtn full" onclick="publishItem()">🐾 Publish Item</button>
+      </div>
+      <div id="c-post-ok" class="success-box" style="display:none">
+        <div class="sico">✓</div>
+        <h3>Item Published!</h3>
+        <p>The item is now visible to students. You will be notified when claim requests come in. 🐾</p>
+        <button class="sbtn outline" onclick="postAnother()">Post Another Item</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════ CLAIM MODAL ══════════ -->
+<div id="ov-claim" class="overlay">
+  <div class="mbox">
+    <div class="mhead">
+      <span class="mtitle">🐾 Claim This Item</span>
+      <button class="mclose" onclick="closeOverlay('ov-claim')">&#215;</button>
+    </div>
+    <div class="mbody">
+      <div class="preview-box" id="claim-preview"></div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:4px">Fill out the form below. CFC will verify your answers before releasing the item.</p>
+      <div class="fsec">Your Information</div>
+      <div class="field"><label>Full Name</label><input type="text" value="Juan Dela Cruz"></div>
+      <div class="field"><label>Student Number</label><input type="text" placeholder="e.g. 2022-00123"></div>
+      <div class="field"><label>Strand &amp; Section</label><input type="text" placeholder="e.g. STEM 11-A"></div>
+      <div class="field"><label>Contact Number</label><input type="text" placeholder="09XX-XXX-XXXX"></div>
+      <div class="fsec">Item Verification</div>
+      <div class="field"><label>Describe the item in detail</label><textarea rows="3" placeholder="Color, brand, markings, contents — be specific."></textarea></div>
+      <div class="field"><label>When did you lose it?</label><input type="date"></div>
+      <div class="field"><label>Where do you think you lost it?</label><input type="text" placeholder="e.g. Canteen, 1st floor"></div>
+      <div class="field"><label>Proof of Ownership (optional)</label><textarea rows="2" placeholder="Serial no., sticker, or marking on the item"></textarea></div>
+    </div>
+    <div class="mfoot">
+      <button class="sbtn" onclick="submitClaim()">🐾 Submit Claim</button>
+      <button class="sbtn outline" onclick="closeOverlay('ov-claim')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ VIEW CLAIM MODAL ══════════ -->
+<div id="ov-view" class="overlay">
+  <div class="mbox">
+    <div class="mhead">
+      <span class="mtitle">📋 Claim — Black Umbrella</span>
+      <button class="mclose" onclick="closeOverlay('ov-view')">&#215;</button>
+    </div>
+    <div class="mbody">
+      <div class="fsec">Claimant Details</div>
+      <table class="dtbl">
+        <tr><td>Full Name</td><td><strong>Juan Dela Cruz</strong></td></tr>
+        <tr><td>Student No.</td><td>2021-00123</td></tr>
+        <tr><td>Strand &amp; Section</td><td>STEM 11-A</td></tr>
+        <tr><td>Contact</td><td>0917-123-4567</td></tr>
+      </table>
+      <div class="fsec">Verification Answers</div>
+      <table class="dtbl">
+        <tr><td>Description</td><td>Black folding umbrella, Mossimo brand, small dent on handle</td></tr>
+        <tr><td>Date Lost</td><td>April 20, 2026</td></tr>
+        <tr><td>Location</td><td>Library, 2nd floor study area</td></tr>
+        <tr><td>Proof</td><td>Initials "JDC" written in marker inside the handle</td></tr>
+      </table>
+    </div>
+    <div class="mfoot">
+      <button class="sbtn green-btn" onclick="closeOverlay('ov-view')">✓ Approve</button>
+      <button class="sbtn red-btn" onclick="closeOverlay('ov-view')">✗ Reject</button>
+      <button class="sbtn outline" onclick="closeOverlay('ov-view')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CLAIM SUCCESS ══════════ -->
+<div id="ov-done" class="overlay">
+  <div class="mbox" style="max-width:370px">
+    <div class="mbody" style="padding:36px 24px">
+      <div class="success-box" style="padding:0">
+        <div class="sico">🐾</div>
+        <h3>Claim Submitted!</h3>
+        <p>Your request has been sent to CFC. They will review your answers and contact you within 1–2 business days.</p>
+        <button class="sbtn" onclick="closeOverlay('ov-done')">Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var ITEMS = [
+  {id:1,name:'Samsung Earbuds',      cat:'Electronics',    icon:'🎧',loc:'Library, 2F',      date:'Apr 24',bg:'#dce8f8'},
+  {id:2,name:'Gray Hoodie (M)',       cat:'Clothing',       icon:'👕',loc:'Canteen',           date:'Apr 23',bg:'#f0ede8'},
+  {id:3,name:'Black Umbrella',        cat:'Accessories',    icon:'☂️',loc:'Room 302, Bldg B', date:'Apr 22',bg:'#dce8f8'},
+  {id:4,name:'Casio Watch',           cat:'Accessories',    icon:'⌚',loc:'Gym',               date:'Apr 21',bg:'#faeeda'},
+  {id:5,name:'Scientific Calculator', cat:'School Supplies',icon:'🧮',loc:'Room 501, Bldg A', date:'Apr 20',bg:'#eaf3de'},
+  {id:6,name:'Blue ID Lace',          cat:'Accessories',    icon:'🪪',loc:'Entrance Gate',     date:'Apr 20',bg:'#fbeaf0'},
+  {id:7,name:'Powerbank (10k mAh)',   cat:'Electronics',    icon:'🔋',loc:'CFC Office',        date:'Apr 18',bg:'#dce8f8'},
+  {id:8,name:'Red Notebook',          cat:'School Supplies',icon:'📓',loc:'Hallway, Bldg C',  date:'Apr 17',bg:'#f0ede8',claimed:true}
+];
+var activeFilter='all';
+var selItem=null;
+
+function showPg(id){
+  var pages=['pg-login','pg-student','pg-cfc'];
+  for(var i=0;i<pages.length;i++){
+    document.getElementById(pages[i]).className=pages[i]===id?'pg active':'pg';
+  }
+}
+function goLogin(){showPg('pg-login');}
+function goStudent(){showPg('pg-student');renderItems();}
+function goCfc(){showPg('pg-cfc');renderCfc();}
+
+function sTab(name,el){
+  var tabs=document.querySelectorAll('#pg-student .tabitem');
+  for(var i=0;i<tabs.length;i++) tabs[i].className='tabitem';
+  el.className='tabitem on';
+  var panes=['s-browse','s-claims','s-report'];
+  var names=['browse','claims','report'];
+  for(var i=0;i<panes.length;i++){
+    document.getElementById(panes[i]).className=names[i]===name?'pane on':'pane';
+  }
+  document.getElementById('s-report-form').style.display='block';
+  document.getElementById('s-report-ok').style.display='none';
+}
+
+function cTab(name,el){
+  var tabs=document.querySelectorAll('#pg-cfc .tabitem');
+  for(var i=0;i<tabs.length;i++) tabs[i].className='tabitem';
+  el.className='tabitem on';
+  var panes=['c-items','c-reqs','c-post'];
+  var names=['items','reqs','post'];
+  for(var i=0;i<panes.length;i++){
+    document.getElementById(panes[i]).className=names[i]===name?'pane on':'pane';
+  }
+  document.getElementById('c-post-form').style.display='block';
+  document.getElementById('c-post-ok').style.display='none';
+}
+
+function filt(el,cat){
+  var chips=document.querySelectorAll('.fc');
+  for(var i=0;i<chips.length;i++) chips[i].className='fc';
+  el.className='fc on';
+  activeFilter=cat;
+  renderItems();
+}
+
+function renderItems(){
+  var list=activeFilter==='all'?ITEMS:ITEMS.filter(function(x){return x.cat===activeFilter;});
+  var html='';
+  for(var i=0;i<list.length;i++){
+    var item=list[i];
+    var click=item.claimed?'':'onclick="openItem('+item.id+')"';
+    html+='<div class="icard'+(item.claimed?' claimed':'')+'" '+click+'>';
+    html+='<div class="ithumb" style="background:'+item.bg+'">'+item.icon+'</div>';
+    html+='<div class="ibody">';
+    html+='<div class="iname">'+item.name+'</div>';
+    html+='<div class="imeta">'+item.loc+'</div>';
+    html+='<div class="imeta">'+item.date+'</div>';
+    html+='<span class="ibadge '+(item.claimed?'gray':'green')+'">'+(item.claimed?'Claimed':'Available 🐾')+'</span>';
+    html+='</div></div>';
+  }
+  document.getElementById('igrid').innerHTML=html;
+}
+
+function renderCfc(){
+  var html='';
+  for(var i=0;i<ITEMS.length;i++){
+    var item=ITEMS[i];
+    html+='<tr><td><strong>'+item.name+'</strong></td>';
+    html+='<td>'+item.cat+'</td><td>'+item.loc+'</td><td>'+item.date+'</td>';
+    html+='<td><span style="display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:bold;background:'+(item.claimed?'#eee':'#EAF3DE')+';color:'+(item.claimed?'#555':'#2d6a0a')+';">'+(item.claimed?'Claimed':'Active')+'</span></td>';
+    html+='<td><button class="tdbtn blue">Edit</button></td></tr>';
+  }
+  document.getElementById('cfc-tbody').innerHTML=html;
+}
+
+function openItem(id){
+  for(var i=0;i<ITEMS.length;i++){
+    if(ITEMS[i].id===id){selItem=ITEMS[i];break;}
+  }
+  if(!selItem) return;
+  document.getElementById('claim-preview').innerHTML=
+    '<div class="pico">'+selItem.icon+'</div>'+
+    '<div><div class="pname">'+selItem.name+'</div>'+
+    '<div class="ploc">Found at: '+selItem.loc+' · '+selItem.date+'</div></div>';
+  openOverlay('ov-claim');
+}
+
+function openOverlay(id){
+  var el=document.getElementById(id);
+  el.className='overlay open';
+  el.scrollTop=0;
+  document.body.style.overflow='hidden';
+}
+function closeOverlay(id){
+  document.getElementById(id).className='overlay';
+  document.body.style.overflow='';
+}
+
+var overlays=document.querySelectorAll('.overlay');
+for(var i=0;i<overlays.length;i++){
+  (function(ov){
+    ov.addEventListener('click',function(e){if(e.target===ov) closeOverlay(ov.id);});
+  })(overlays[i]);
+}
+
+function submitClaim(){closeOverlay('ov-claim');openOverlay('ov-done');}
+function submitReport(){
+  document.getElementById('s-report-form').style.display='none';
+  document.getElementById('s-report-ok').style.display='block';
+}
+function anotherReport(){
+  document.getElementById('s-report-ok').style.display='none';
+  document.getElementById('s-report-form').style.display='block';
+}
+function publishItem(){
+  document.getElementById('c-post-form').style.display='none';
+  document.getElementById('c-post-ok').style.display='block';
+}
+function postAnother(){
+  document.getElementById('c-post-ok').style.display='none';
+  document.getElementById('c-post-form').style.display='block';
+}
+</script>
+</body>
+</html>
